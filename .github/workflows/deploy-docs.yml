@@ -1,17 +1,31 @@
-name: Build & Deploy Storybook
+name: Deploy Storybook
+
 on:
   push:
-    branches:
-      - master
+    braches:
+      - main
+
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-lastest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Install and Build 🔧
-        # This needs an Acces Token stored as "GH_TOKEN" 👇
-        run: |
-          npm install
-          npm run deploy-storybook -- --ci
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      -name: Install Dependencies
+        run: npm ci
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Deploy Storybook
+        run: npm run deploy-storybook -- --ci --existing-output-dir=storybook-static
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_TOKEN: ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}
+      
